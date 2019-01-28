@@ -9,7 +9,6 @@
     "files": [
         "README.md",
         "main.ts",
-        "README.md",
         "driver.ts"
     ],
     "testFiles": [
