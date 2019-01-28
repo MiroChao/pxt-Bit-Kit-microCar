@@ -1,6 +1,6 @@
 {
     "name": "Grove-Zero-BitKit",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "The Grove Zero Bit Kit micro:Car extension for micro:bit",
     "license": "MIT",
     "dependencies": {
