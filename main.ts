@@ -177,12 +177,13 @@ namespace BitKit {
     //% degree.min=0 degree.max=180 degree.defl=0
     //% weight=100
     //% group="Servo"
+    /*
     export function moveServoTo(degree: number) {
         let data: Buffer = pins.createBuffer(2);
         data[0] = 0x02;
         data[1] = degree;
         driver.i2cSendBytes(0x24, data);
-    }
+    }*/
 
     /**
      * Set the actions and the moving speed of motormodule.
