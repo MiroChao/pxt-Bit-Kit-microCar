@@ -80,94 +80,8 @@ enum MotionTpye {
  * Extension blocks
  */
 //% weight=48 color=#0063A0 icon="\uf018" block="BitKit"
-//% groups="['Color Line Follower', 'Chassis', 'Servo']"
+//% groups="['Color Line Follower', 'Chassis']"
 namespace BitKit {
-
-    /**
-     * Do something when the color sensor detects a specific color.
-     * @param event type of color to detect
-     * @param handler code to run
-     */
-    //% blockId=sensor_color_create_event block="on Color Line Follower seeing |%event"
-    //% weight=99
-    //% group="Color Line Follower"
-    export function onColor(event: ColorEvent, handler: () => void) {
-        const eventId = driver.subscribeToEventSource(SensorType.Liner);
-        control.onEvent(eventId, event, handler);
-    }
-
-    export let linerEventValue = 0;
-    const eventIdLiner = 9000;
-    let initLiner = false;
-    let lastLiner = 0;
-
-    /**
-     * Do something when the line follower recognized the position of the line underneath.
-     * @param event type of liner to detect
-     * @param handler code to run
-     */
-    //% blockId=sensor_liner_create_event block="on Color Line Follower line position|%event"
-    //% weight=100 
-    //% group="Color Line Follower"
-    export function onLinePosition(event: LinerEvent, handler: () => void) {
-        control.onEvent(eventIdLiner, event, handler);
-        if (!initLiner) {
-            initLiner = true;
-            control.inBackground(() => {
-                while (true) {
-                    driver.i2cSendByte(SensorType.Liner, 0x02);
-                    const event = driver.i2cReceiveByte(SensorType.Liner);
-                    if (event > 2) linerEventValue = event;
-                    if (event != lastLiner) {
-                        lastLiner = event;
-                        control.raiseEvent(eventIdLiner, lastLiner);
-                    }
-                    basic.pause(50);
-                }
-            })
-        }
-    }
-
-    /**
-     * Get the color value from the color sensor in R:G:B.
-     */
-    //% blockId=sensor_get_color_rgb block="Color Line Follower color value"
-    //% weight=96
-    //% group="Color Line Follower"
-    export function getColor(): number {
-        let data: Buffer = pins.createBuffer(4);
-        driver.i2cSendByte(SensorType.Liner, 0x04);
-        data = driver.i2cReceiveBytes(SensorType.Liner, 4);
-        return (data[0] + data[1] * 256 + data[2] * 65536);
-    }
-
-    /**
-     * See if the color sensor detected a specific color.
-     * @param event of color device
-     */
-    //% blockId=sensor_is_color_event_generate block="Color Line Follower see color|%event|"
-    //% weight=97
-    //% group="Color Line Follower"
-    export function wasColorTriggered(event: ColorEvent): boolean {
-        let eventValue = event;
-        if (driver.addrBuffer[SensorType.Liner] == 0) onColor(event, () => { });
-        if (driver.lastStatus[SensorType.Liner] == eventValue) return true;
-        return false;
-    }
-
-    /**
-     * See if the line follower recognized the position of the line underneath.
-     * @param event of liner device
-     */
-    //% blockId=sensor_is_liner_event_generate block="Color Line Follower see line at|%event|"
-    //% weight=98
-    //% group="Color Line Follower"
-    export function wasLinePositionTriggered(event: LinerEvent): boolean {
-        let eventValue = event;
-        if (!initLiner) onLinePosition(event, () => { });
-        if (lastLiner == eventValue) return true;
-        return false;
-    }
 
     /**
      * Set the actions and the moving speed of motormodule.
@@ -247,5 +161,91 @@ namespace BitKit {
         data[3] = right & 0xff;
         data[4] = (right >> 8) & 0xff;
         driver.i2cSendBytes(MotorTpye.Wheel, data);
+    }
+
+    export let linerEventValue = 0;
+    const eventIdLiner = 9000;
+    let initLiner = false;
+    let lastLiner = 0;
+
+    /**
+     * Do something when the line follower recognized the position of the line underneath.
+     * @param event type of liner to detect
+     * @param handler code to run
+     */
+    //% blockId=sensor_liner_create_event block="on Color Line Follower line position|%event"
+    //% weight=100 
+    //% group="Color Line Follower"
+    export function onLinePosition(event: LinerEvent, handler: () => void) {
+        control.onEvent(eventIdLiner, event, handler);
+        if (!initLiner) {
+            initLiner = true;
+            control.inBackground(() => {
+                while (true) {
+                    driver.i2cSendByte(SensorType.Liner, 0x02);
+                    const event = driver.i2cReceiveByte(SensorType.Liner);
+                    if (event > 2) linerEventValue = event;
+                    if (event != lastLiner) {
+                        lastLiner = event;
+                        control.raiseEvent(eventIdLiner, lastLiner);
+                    }
+                    basic.pause(50);
+                }
+            })
+        }
+    }
+
+    /**
+     * Do something when the color sensor detects a specific color.
+     * @param event type of color to detect
+     * @param handler code to run
+     */
+    //% blockId=sensor_color_create_event block="on Color Line Follower see |%event"
+    //% weight=99
+    //% group="Color Line Follower"
+    export function onColor(event: ColorEvent, handler: () => void) {
+        const eventId = driver.subscribeToEventSource(SensorType.Liner);
+        control.onEvent(eventId, event, handler);
+    }
+
+    /**
+     * See if the line follower recognized the position of the line underneath.
+     * @param event of liner device
+     */
+    //% blockId=sensor_is_liner_event_generate block="Color Line Follower see line at|%event|"
+    //% weight=98
+    //% group="Color Line Follower"
+    export function wasLinePositionTriggered(event: LinerEvent): boolean {
+        let eventValue = event;
+        if (!initLiner) onLinePosition(event, () => { });
+        if (lastLiner == eventValue) return true;
+        return false;
+    }
+
+    /**
+     * See if the color sensor detected a specific color.
+     * @param event of color device
+     */
+    //% blockId=sensor_is_color_event_generate block="Color Line Follower see color|%event|"
+    //% weight=97
+    //% group="Color Line Follower"
+    export function wasColorTriggered(event: ColorEvent): boolean {
+        let eventValue = event;
+        if (driver.addrBuffer[SensorType.Liner] == 0) onColor(event, () => { });
+        if (driver.lastStatus[SensorType.Liner] == eventValue) return true;
+        return false;
+    }
+
+    /**
+     * Get the color value from the color sensor in R:G:B.
+     */
+    //% blockId=sensor_get_color_rgb block="Color Line Follower color value"
+    //% weight=96
+    //% group="Color Line Follower"
+    export function getColor(): number {
+        let data: Buffer = pins.createBuffer(4);
+        driver.i2cSendByte(SensorType.Liner, 0x04);
+        data = driver.i2cReceiveBytes(SensorType.Liner, 4);
+        return (data[0] + data[1] * 256 + data[2] * 65536);
     }
 }
