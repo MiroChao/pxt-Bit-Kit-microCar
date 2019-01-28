@@ -1,18 +1,20 @@
 {
-    "name": "pxt-bit-microcar",
-    "version": "0.0.0",
-    "description": "",
+    "name": "Bit:microCar",
+    "version": "1.0.0",
+    "description": "The Grove Zero Bit:microCar Kit extension for micro:bit",
+    "license": "MIT",
     "dependencies": {
-        "core": "*",
-        "radio": "*"
+        "core": "*"
     },
     "files": [
         "README.md",
-        "main.ts"
+        "main.ts",
+        "README.md",
+        "driver.ts"
     ],
     "testFiles": [
         "test.ts"
     ],
-    "public": false,
+    "public": true,
     "additionalFilePaths": []
 }
